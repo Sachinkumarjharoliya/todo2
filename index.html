@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="containt">
+        <h1>Todo_List</h1>
+        <h3>Enter</h3>
+        <input
+          type="text"
+          id="todoInput"
+          onkeydown="addData(event)"
+          placeholder="Please Add some Item"
+        />
+        <br /><br />
+        <div>
+          <h3>Todo Items:</h3>
+          <ul id="show" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
+          <!-- Added ondrop and ondragover events -->
+          <button onclick="Add_item()">Submit</button>
+        </div>
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Edit Data</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Checked values will be displayed here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      let arry = [];
+
+      function addData(event) {
+        if (event.key === "Enter") {
+          let Input = document.getElementById("todoInput").value;
+          console.log(Input);
+          let user = {
+            Arry: Input,
+          };
+          console.log("obj", user);
+          arry.push(user);
+          console.log("arryobj", arry);
+          let result = "";
+          arry.forEach((item, index) => {
+            console.log("item", item);
+            result += `<li draggable="true" id="item-${index}" ondragstart="drag(event)"><input type="checkbox" value="${item.Arry}">${item.Arry}</li>`; // Added draggable attribute and ondragstart event
+          });
+          document.getElementById("show").innerHTML = result;
+          document.getElementById("todoInput").value = ""; // Clear the input field after adding data
+        }
+      }
+
+      function Add_item() {
+        const tableBody = document.getElementById("tableBody");
+        arry.forEach((item) => {
+          if (
+            document
+              .getElementById(`item-${arry.indexOf(item)}`)
+              .querySelector('input[type="checkbox"]').checked
+          ) {
+            const newRow = tableBody.insertRow();
+            const cell1 = newRow.insertCell();
+            const cell2 = newRow.insertCell();
+            const cell3 = newRow.insertCell();
+            cell1.textContent = item.Arry;
+            cell2.innerHTML = '<button onclick="editItem(this)">Edit</button>';
+            cell3.innerHTML =
+              '<button onclick="deleteItem(this)">Delete</button>';
+          }
+        });
+      }
+
+      function editItem(button) {
+        const row = button.parentNode.parentNode;
+        const index = row.rowIndex - 1; // Adjust for the header row
+        const newValue = prompt("Enter new value:");
+        // if (newValue !== null) {
+        //   arry[index].Arry = newValue;
+        //   row.cells[0].textContent = newValue;
+        // }s
+      }
+
+      function deleteItem(button) {
+        const row = button.parentNode.parentNode;
+        // const index = row.rowIndex - 1; // Adjust for the header row
+        arry.splice(index, 1);
+        row.remove();
+      }
+
+      function allowDrop(event) {
+        event.preventDefault();
+      }
+
+      function drag(event) {
+        event.dataTransfer.setData("text", event.target.id);
+      }
+
+      function drop(event) {
+        event.preventDefault();
+        const data = event.dataTransfer.getData("text");
+        const draggedItem = document.getElementById(data);
+        event.target.appendChild(draggedItem);
+      }
+    </script>
+  </body>
+</html>
